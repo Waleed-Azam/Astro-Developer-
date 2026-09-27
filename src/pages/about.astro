@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+---
+<BaseLayout title="Studio — Fjord & Form" description="The studio behind 120+ interiors across Western Norway. Senior-only team, daylight-first method, fixed prices." currentPath="/about">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">The studio</p>
+      <h1 class="heading-xl" style="margin-top:.8rem">Senior people, <span class="serif-i" style="color:var(--accent-dark)">sharp pencils.</span></h1>
+      <p class="lead">Founded 2016 in Stavanger. Eight designers, zero account-manager layers — you talk to the person who draws your space.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split">
+      <div class="reveal">
+        <img src="/images/hero-studio.svg" alt="Inside the Fjord & Form studio at Verksgata 12" style="border-radius:var(--radius-lg);border:1px solid var(--line)" width="1200" height="900" />
+      </div>
+      <div class="reveal reveal-d1">
+        <h2 class="heading-md">How we work</h2>
+        <div class="prose" style="margin-top:1rem">
+          <p><strong>Week 1 — Measure.</strong> Daylight readings, behaviour mapping, honest interviews. We find the problem before the style.</p>
+          <p><strong>Weeks 2–4 — Draw.</strong> Two directions, one recommendation. You see materials in real light, not renders alone.</p>
+          <p><strong>Build — Document.</strong> A FF&E bible and drawing set your contractors can actually build from — then site visits until handover.</p>
+        </div>
+        <div class="tag-row" style="margin-top:1.2rem">
+          <span class="tag">Fixed price</span><span class="tag">Senior only</span><span class="tag">2-day replies</span><span class="tag">Norsk + English</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow reveal">Services in detail</p>
+      <h2 class="heading-lg reveal" style="margin:.8rem 0 1.6rem">What each engagement includes</h2>
+      <div class="grid-2">
+        {[
+          { t: 'Workplace', d: 'Behaviour mapping, acoustic zoning, test-fits, full drawing set, FF&E procurement, move-in support. Typical range 200 m² – 3,000 m².', p: 'From 180k NOK' },
+          { t: 'Hospitality', d: 'Concept, guest-journey mapping, phased build planning, FF&E bible, art & lighting program, opening-week support.', p: 'From 250k NOK' },
+          { t: 'Residential', d: 'Daylight study, plan optimisation, material palette, kitchen & bath detailing, contractor tender set, site visits.', p: 'From 90k NOK' },
+          { t: 'Advisory', d: 'Pre-lease evaluations, daylight & acoustic audits, palette refreshes. A senior designer, a written report, a fixed fee.', p: 'From 25k NOK' },
+        ].map((s, i) => (
+          <div class={`card reveal reveal-d${i % 3}`}>
+            <div class="card-body" style="padding:1.8rem">
+              <h3 class="heading-sm">{s.t}</h3>
+              <p class="muted" style="margin-top:.6rem">{s.d}</p>
+              <p style="margin-top:1rem"><span class="badge"><span class="badge-dot"></span>{s.p}</span></p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="Like how we think? Let’s talk about your space." />
+</BaseLayout>

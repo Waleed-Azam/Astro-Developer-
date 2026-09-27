@@ -1,0 +1,48 @@
+---
+/** Footer — migrated from Webflow "Footer" symbol. */
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="brand" aria-label="Fjord & Form — home">
+          <span class="brand-mark" aria-hidden="true" style="background:#faf8f4;color:#1b1a17">F</span>
+          <span style="color:#faf8f4">Fjord &amp; Form<small>Stavanger · Est. 2016</small></span>
+        </a>
+        <p>Interior architecture for workplaces, hospitality and homes across Rogaland — and beyond.</p>
+        <p style="margin-top:1rem"><span class="badge" style="background:#232220;border-color:#3a3935;color:#e9e4d8"><span class="badge-dot"></span>Rebuilt in Astro · Hosted on Cloudflare</span></p>
+      </div>
+      <div class="footer-col">
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/work">Selected work</a></li>
+          <li><a href="/journal">Journal</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/about#services">Workplace</a></li>
+          <li><a href="/about#services">Hospitality</a></li>
+          <li><a href="/about#services">Residential</a></li>
+          <li><a href="/about#services">Advisory</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Find us</h4>
+        <ul>
+          <li>Verksgata 12<br />4013 Stavanger</li>
+          <li><a href="mailto:hello@fjord-and-form.demo">hello@fjord-and-form.demo</a></li>
+          <li><a href="tel:+4751900000">+47 519 00 000</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>{year}</span> Fjord &amp; Form AS · Org. 123 456 789</span>
+      <span>Webflow → Astro demo · <a href="/migration">Migration notes</a> · <a href="/contact">Privacy on request</a></span>
+    </div>
+  </div>
+</footer>

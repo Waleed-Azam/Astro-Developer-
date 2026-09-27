@@ -1,0 +1,36 @@
+---
+/** Contact — Webflow Form → Astro API + Resend + Railway backup. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+<BaseLayout title="Contact — Fjord & Form" description="Start a project: tell us about your space and get a reply within two working days." currentPath="/contact">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Contact</p>
+      <h1 class="heading-xl" style="margin-top:.8rem">Tell us about <span class="serif-i" style="color:var(--accent-dark)">your space.</span></h1>
+      <p class="lead">Two working days, honest answer. If we're not the right fit, we'll say so — and suggest who is.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container split" style="align-items:start">
+      <div class="reveal">
+        <ContactForm />
+        <p class="muted" style="font-size:.85rem;margin-top:1rem">Prefer email? <a href="mailto:hello@fjord-and-form.demo" style="text-decoration:underline">hello@fjord-and-form.demo</a> · Demo form sends via <code style="font-family:var(--font-mono)">/api/contact</code> → Resend, with a Railway backup (see <a href="/migration#forms" style="text-decoration:underline">migration notes</a>).</p>
+      </div>
+      <aside class="reveal reveal-d1">
+        <div class="card"><div class="card-body" style="padding:1.8rem">
+          <h2 class="heading-sm">What happens next</h2>
+          <ol style="margin:1rem 0 0 1.2rem;color:var(--ink-soft);display:grid;gap:.7rem">
+            <li><strong style="color:var(--ink)">Day 1–2:</strong> a senior designer replies — with questions, not a quote.</li>
+            <li><strong style="color:var(--ink)">Week 1:</strong> 45-min walkthrough (on site or video) + fixed-price proposal.</li>
+            <li><strong style="color:var(--ink)">Week 2+:</strong> measure, draw, build. You always know the next step.</li>
+          </ol>
+        </div></div>
+        <div class="card" style="margin-top:1.2rem"><div class="card-body" style="padding:1.8rem">
+          <h2 class="heading-sm">Studio</h2>
+          <p class="muted" style="margin-top:.6rem">Verksgata 12, 4013 Stavanger<br />Mon–Fri 08:30–16:30<br /><a href="mailto:hello@fjord-and-form.demo" style="text-decoration:underline">hello@fjord-and-form.demo</a><br /><a href="tel:+4751900000" style="text-decoration:underline">+47 519 00 000</a></p>
+        </div></div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

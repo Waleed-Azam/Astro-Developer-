@@ -1,0 +1,36 @@
+---
+/** Journal index — Webflow "Blog" collection → Astro content collection. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('journal'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title="Journal — Fjord & Form" description="Guides and notes from the studio: daylight, acoustics, and the craft of interiors." currentPath="/journal">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Journal</p>
+      <h1 class="heading-xl" style="margin-top:.8rem">Notes from <span class="serif-i" style="color:var(--accent-dark)">the studio.</span></h1>
+      <p class="lead">Practical guides, no fluff. Written by the designers who did the work.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container journal-grid">
+      {posts.map((p, i) => (
+        <a href={`/journal/${p.slug}`} class={`card reveal reveal-d${i % 3}`}>
+          <img class="card-img" src={p.data.cover} alt={p.data.coverAlt} loading={i === 0 ? 'eager' : 'lazy'} width="1200" height="900" />
+          <div class="card-body">
+            <p class="muted" style="font-size:.82rem;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">
+              {p.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {p.data.author}
+            </p>
+            <h2 class="heading-sm" style="margin-top:.4rem">{p.data.title}</h2>
+            <p class="muted" style="font-size:.95rem;margin-top:.3rem">{p.data.description}</p>
+            <div class="tag-row">{p.data.tags.map((t) => (<span class="tag">{t}</span>))}</div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>

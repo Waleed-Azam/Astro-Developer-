@@ -1,0 +1,114 @@
+---
+/**
+ * ContactForm — replaces Webflow Forms (which lock you into Webflow + limits).
+ * - Progressive enhancement: works without JS (native POST → JSON → fallback message)
+ * - With JS: fetch to /api/contact, inline errors, honeypot spam trap
+ * - Validation mirrors src/lib/validation.ts (same rules as server)
+ */
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<form class="form-card" data-contact-form method="POST" action="/api/contact" novalidate>
+  <div class="form-grid">
+    <div class="field" data-field="name">
+      <label for="cf-name">Name <span class="req" aria-hidden="true">*</span></label>
+      <input id="cf-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder="Kari Nordmann" />
+      <span class="error" data-error>Please enter your name.</span>
+    </div>
+    <div class="field" data-field="email">
+      <label for="cf-email">Email <span class="req" aria-hidden="true">*</span></label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" required placeholder="kari@company.no" />
+      <span class="error" data-error>Please enter a valid email address.</span>
+    </div>
+    {!compact && (
+      <>
+        <div class="field" data-field="company">
+          <label for="cf-company">Company</label>
+          <input id="cf-company" name="company" type="text" autocomplete="organization" placeholder="Company AS (optional)" />
+        </div>
+        <div class="field" data-field="budget">
+          <label for="cf-budget">Budget range</label>
+          <select id="cf-budget" name="budget">
+            <option value="">Prefer not to say</option>
+            <option>Under 200k NOK</option>
+            <option>200–500k NOK</option>
+            <option>500k–1.5M NOK</option>
+            <option>1.5M+ NOK</option>
+          </select>
+        </div>
+      </>
+    )}
+    <div class="field full" data-field="message">
+      <label for="cf-message">Project details <span class="req" aria-hidden="true">*</span></label>
+      <textarea id="cf-message" name="message" required minlength="20" maxlength="5000" placeholder="Where is the space, how big, what timeline are you thinking? (min. 20 characters)"></textarea>
+      <span class="hint">The more context, the better our first reply.</span>
+      <span class="error" data-error>Please tell us a little more (min. 20 characters).</span>
+    </div>
+    {/* Honeypot — invisible to humans, catches bots */}
+    <div class="hp" aria-hidden="true">
+      <label>Website (leave empty)<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+    </div>
+  </div>
+  <div style="margin-top:1.3rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+    <button type="submit" class="button button-accent" data-submit>Send enquiry <span class="arrow">→</span></button>
+    <span class="muted" style="font-size:.88rem">Replies within 2 working days · No newsletters, ever.</span>
+  </div>
+  <div class="form-status" data-status role="status" aria-live="polite"></div>
+</form>
+
+<script>
+  document.querySelectorAll('[data-contact-form]').forEach((form) => {
+    const formEl = form as HTMLFormElement;
+    const status = formEl.querySelector('[data-status]') as HTMLElement;
+    const submitBtn = formEl.querySelector('[data-submit]') as HTMLButtonElement;
+    const showStatus = (msg: string, kind: 'success' | 'error') => {
+      status.textContent = msg;
+      status.className = `form-status show ${kind}`;
+    };
+    const setFieldError = (name: string, msg: string | null) => {
+      const field = formEl.querySelector(`[data-field="${name}"]`);
+      if (!field) return;
+      field.classList.toggle('invalid', !!msg);
+      const err = field.querySelector('[data-error]');
+      if (err && msg) err.textContent = msg;
+    };
+    formEl.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      status.className = 'form-status';
+      formEl.querySelectorAll('.field.invalid').forEach((f) => f.classList.remove('invalid'));
+      const data = Object.fromEntries(new FormData(formEl).entries());
+      // Client-side check (mirrors server rules — server re-validates regardless)
+      let hasError = false;
+      if (String(data.name || '').trim().length < 2) { setFieldError('name', 'Please enter your name (min. 2 characters).'); hasError = true; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(data.email || '').trim())) { setFieldError('email', 'Please enter a valid email address.'); hasError = true; }
+      if (String(data.message || '').trim().length < 20) { setFieldError('message', 'Tell us a little more — at least 20 characters helps us reply well.'); hasError = true; }
+      if (hasError) { showStatus('Please fix the highlighted fields and try again.', 'error'); return; }
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.ok) {
+          formEl.reset();
+          showStatus(json.mocked
+            ? '✓ Thanks! (Demo mode: email logged, not sent — connect RESEND_API_KEY to go live.)'
+            : '✓ Thank you! Your enquiry is on its way. We reply within two working days.', 'success');
+        } else if (json.errors) {
+          Object.entries(json.errors).forEach(([k, v]) => setFieldError(k, String(v)));
+          showStatus('Please fix the highlighted fields and try again.', 'error');
+        } else {
+          showStatus(json.error || 'Something went wrong. Please email hello@fjord-and-form.demo directly.', 'error');
+        }
+      } catch {
+        showStatus('Network error. Check your connection — or email hello@fjord-and-form.demo directly.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send enquiry <span class="arrow">→</span>';
+      }
+    });
+  });
+</script>

@@ -1,0 +1,32 @@
+---
+/** Work index — Webflow "Projects Template" listing → Astro content collection. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getCollection } from 'astro:content';
+const projects = (await getCollection('projects')).sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title));
+---
+<BaseLayout title="Selected work — Fjord & Form" description="Case studies across workplace, hospitality and residential — 120+ projects since 2016." currentPath="/work">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Selected work</p>
+      <h1 class="heading-xl" style="margin-top:.8rem">Rooms with <span class="serif-i" style="color:var(--accent-dark)">reasons.</span></h1>
+      <p class="lead">Six of 120+. Every project below shipped on a fixed price — ask us for the full list and references.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container grid-3">
+      {projects.map((p, i) => (
+        <a href={`/work/${p.slug}`} class={`card project-card reveal reveal-d${i % 3}`}>
+          <img class="card-img" src={p.data.cover} alt={p.data.coverAlt} loading={i < 3 ? 'eager' : 'lazy'} width="1200" height="900" />
+          <div class="card-body">
+            <p class="muted" style="font-size:.82rem;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">{p.data.location} · {p.data.year}</p>
+            <h2 class="heading-sm" style="margin-top:.4rem">{p.data.title}</h2>
+            <p class="muted" style="font-size:.95rem;margin-top:.3rem">{p.data.summary}</p>
+            <div class="tag-row">{p.data.services.map((s) => (<span class="tag">{s}</span>))}</div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>

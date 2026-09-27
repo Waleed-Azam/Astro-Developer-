@@ -1,0 +1,164 @@
+---
+/**
+ * BaseLayout — every page inherits SEO, header/footer and global interactions.
+ * Webflow parity notes:
+ *  - Webflow's site-wide <head> custom code → `head` slot below
+ *  - Webflow Navbar symbol → Header.astro component
+ *  - Webflow Footer symbol → Footer.astro component
+ *  - Webflow page-level interactions → single delegated client script (no jQuery, no framework)
+ */
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentPath?: string;
+  ogImage?: string;
+}
+const {
+  title,
+  description = 'Fjord & Form — interior architecture studio in Stavanger. Strategy, space and craft for workplaces, hospitality and homes.',
+  currentPath = '/',
+  ogImage = '/images/og-default.svg',
+} = Astro.props;
+
+const siteUrl = (import.meta.env.PUBLIC_SITE_URL ?? Astro.site?.toString() ?? 'http://localhost:4321').replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, siteUrl).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph / Twitter (Webflow SEO settings → here, typed + tested) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fjord & Form" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${siteUrl}${ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <meta name="theme-color" content="#1b1a17" />
+
+    <!-- Display font: optional enhancement, system serif fallback keeps LCP fast.
+         Webflow used Google Fonts render-blocking; here we preload + display=swap. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="parity-bar">
+      Demo migration: this page was <strong>Webflow</strong> — now <strong>Astro + Cloudflare</strong>.
+      Same classes, same design tokens, <code>0&nbsp;KB</code> of Webflow JS. &nbsp;·&nbsp; <a href="/migration" style="text-decoration:underline">How it was migrated →</a>
+    </div>
+
+    <Header currentPath={currentPath} />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Global interactions: ONE script, delegated, framework-free.
+         Replaces: Webflow Navbar, Scroll-into-view, Accordion, Slider, Marquee pause. -->
+    <script>
+      // Sticky header shadow
+      const header = document.querySelector('.site-header');
+      const onScroll = () => header?.classList.toggle('scrolled', window.scrollY > 8);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Mobile menu (Webflow Navbar interaction → 10 lines)
+      const menuBtn = document.querySelector('[data-menu-button]');
+      const mobileMenu = document.querySelector('[data-mobile-menu]');
+      menuBtn?.addEventListener('click', () => {
+        const open = mobileMenu?.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', String(!!open));
+        (menuBtn as HTMLElement).textContent = open ? 'Close ✕' : 'Menu ☰';
+      });
+
+      // Scroll reveal (Webflow "Scroll into view" → IntersectionObserver)
+      const revealEls = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
+          { threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+        );
+        revealEls.forEach((el) => io.observe(el));
+      } else {
+        revealEls.forEach((el) => el.classList.add('in'));
+      }
+
+      // Accordion (delegated so CMS-rendered items work too)
+      document.addEventListener('click', (ev) => {
+        const btn = (ev.target as HTMLElement).closest('[data-accordion-button]');
+        if (!btn) return;
+        const item = btn.closest('[data-accordion-item]');
+        if (!item) return;
+        const isOpen = item.getAttribute('data-open') === 'true';
+        // Single-open behaviour (matches original Webflow accordion)
+        item.parentElement
+          ?.querySelectorAll('[data-accordion-item]')
+          .forEach((sib) => sib.setAttribute('data-open', 'false'));
+        item.setAttribute('data-open', String(!isOpen));
+        btn.setAttribute('aria-expanded', String(!isOpen));
+      });
+
+      // Testimonial slider (Webflow Slider → accessible + auto-advance)
+      document.querySelectorAll('[data-slider]').forEach((slider) => {
+        const slides = [...slider.querySelectorAll('[data-slide]')];
+        const dotsWrap = slider.querySelector('[data-dots]');
+        let index = 0;
+        let timer: number | undefined;
+
+        const go = (i: number) => {
+          index = (i + slides.length) % slides.length;
+          slides.forEach((s, k) => s.classList.toggle('active', k === index));
+          dotsWrap?.querySelectorAll('button').forEach((d, k) => {
+            d.classList.toggle('active', k === index);
+            d.setAttribute('aria-label', `Go to slide ${k + 1}`);
+          });
+        };
+        const autoplay = () => {
+          window.clearInterval(timer);
+          timer = window.setInterval(() => go(index + 1), 6000);
+        };
+        slider.querySelector('[data-prev]')?.addEventListener('click', () => { go(index - 1); autoplay(); });
+        slider.querySelector('[data-next]')?.addEventListener('click', () => { go(index + 1); autoplay(); });
+        dotsWrap?.querySelectorAll('button').forEach((d, k) =>
+          d.addEventListener('click', () => { go(k); autoplay(); })
+        );
+        slider.addEventListener('mouseenter', () => window.clearInterval(timer));
+        slider.addEventListener('mouseleave', autoplay);
+        go(0);
+        autoplay();
+      });
+
+      // Footer year
+      document.querySelectorAll('[data-year]').forEach((el) => ((el as HTMLElement).textContent = String(new Date().getFullYear())));
+    </script>
+  </body>
+</html>

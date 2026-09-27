@@ -1,0 +1,13 @@
+# Railway service config (connect repo → set Root Directory to /backend).
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+
+# Required env vars (Railway dashboard → Variables):
+#   ADMIN_TOKEN        — random 32+ chars (protects GET /api/enquiries)
+#   ALLOWED_ORIGINS    — e.g. https://fjord-and-form.demo,https://staging-xxx.pages.dev

@@ -1,0 +1,54 @@
+---
+/** Project case page — Webflow "Projects Template" CMS page → Astro dynamic route. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((p) => ({ params: { slug: p.slug }, props: { slug: p.slug } }));
+}
+const { slug } = Astro.props;
+const all = await getCollection('projects');
+const entry = all.find((p) => p.slug === slug);
+if (!entry) return Astro.redirect('/404');
+const { Content } = await entry.render();
+const next = all.filter((p) => p.slug !== slug).slice(0, 2);
+const { data } = entry;
+---
+<BaseLayout title={`${data.title} — Fjord & Form`} description={data.summary} currentPath="/work" ogImage={data.cover}>
+  <section class="page-hero">
+    <div class="container">
+      <p><a href="/work" style="text-decoration:underline">← All projects</a></p>
+      <p class="eyebrow" style="margin-top:1rem">{data.location} · {data.year}</p>
+      <h1 class="heading-xl" style="margin-top:.8rem">{data.title}</h1>
+      <p class="lead">{data.summary}</p>
+      <div class="tag-row" style="margin-top:1.2rem">
+        <span class="tag">Client: {data.client}</span>
+        {data.area && <span class="tag">{data.area}</span>}
+        {data.duration && <span class="tag">{data.duration}</span>}
+        {data.services.map((s) => (<span class="tag">{s}</span>))}
+      </div>
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="container">
+      <img src={data.cover} alt={data.coverAlt} style="border-radius:var(--radius-lg);border:1px solid var(--line);width:100%" width="1200" height="900" />
+      <div class="prose" style="margin-top:2.2rem"><Content /></div>
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="container">
+      <h2 class="heading-md" style="margin-bottom:1.4rem">Keep exploring</h2>
+      <div class="grid-2">
+        {next.map((p) => (
+          <a href={`/work/${p.slug}`} class="card project-card">
+            <img class="card-img" src={p.data.cover} alt={p.data.coverAlt} loading="lazy" width="1200" height="900" />
+            <div class="card-body"><h3 class="heading-sm">{p.data.title}</h3><p class="muted">{p.data.location} · {p.data.year}</p></div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  <CtaBand title="Want results like these? Start with a conversation." />
+</BaseLayout>

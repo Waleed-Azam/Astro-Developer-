@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+<rect width="1200" height="900" fill="#efe7d8"/>
+<circle cx="880" cy="220" r="150" fill="#d9c9a3" opacity="0.9"/>
+<rect x="180" y="260" width="340" height="560" rx="170" fill="#5f7161"/>
+<rect x="580" y="380" width="260" height="440" rx="130" fill="#5f7161" opacity="0.55"/>
+<rect x="120" y="720" width="960" height="14" fill="#1b1a17" opacity="0.6"/>
+<rect x="180" y="600" width="220" height="120" rx="8" fill="#1b1a17" opacity="0.5"/>
+<text x="100" y="120" font-family="Georgia,serif" font-style="italic" font-size="64" fill="#1b1a17">Solstrand Villa</text>
+<text x="100" y="170" font-family="monospace" font-size="26" letter-spacing="6" fill="#1b1a17" opacity="0.8">RESIDENTIAL — 2023</text>
+</svg>

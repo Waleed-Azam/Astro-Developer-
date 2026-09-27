@@ -1,0 +1,17 @@
+# Cloudflare Pages / Workers config for the Astro frontend.
+# Deploy via: npx wrangler pages deploy ./dist
+name = "fjord-and-form-astro"
+compatibility_date = "2024-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+PUBLIC_SITE_NAME = "Fjord & Form"
+# Set secrets via dashboard or CLI (never commit):
+#   npx wrangler pages secret put RESEND_API_KEY
+#   npx wrangler pages secret put CONTACT_TO_EMAIL
+#   npx wrangler pages secret put RAILWAY_API_URL
+
+# Build settings (mirror these in Cloudflare dashboard):
+#   Build command: npm run build
+#   Build output directory: dist
+#   Node version: 20

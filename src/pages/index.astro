@@ -1,0 +1,202 @@
+---
+/**
+ * Homepage — migrated from Webflow "Home" page, section by section:
+ *  Hero → logos marquee → intro/stats → featured work → services accordion
+ *  → testimonials slider → journal teaser → CTA.
+ * Zero client JS framework: all interactions are CSS + the delegated BaseLayout script.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.year - a.data.year);
+const posts = (await getCollection('journal'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const services = [
+  { title: 'Workplace', body: 'Offices people choose to come to: acoustic zoning, focus rooms, and team spaces tuned to how your crews actually work. From 200 m² fit-outs to full headquarters.' },
+  { title: 'Hospitality', body: 'Hotels, restaurants and bars designed with operators — phased builds that keep revenue running, FF&E bibles your team can maintain, and rooms that photograph themselves.' },
+  { title: 'Residential', body: 'Homes and cabins where every centimetre works twice: storage walls, daylight planning, and materials that grey gracefully instead of demanding repainting.' },
+  { title: 'Advisory', body: 'Not ready for a full project? Daylight studies, pre-lease evaluations, and material palettes — senior advice in weeks, not months, with a fixed price up front.' },
+];
+
+const testimonials = [
+  { quote: 'They think like operators, not just designers. Every choice had a reason we could explain to the board.', name: 'Hotel Director', detail: 'Skagen Brygge · Hospitality, 2025' },
+  { quote: 'Meeting-room complaints fell by 70%. Desk utilisation is up because people actually want to come in.', name: 'Head of Workplace', detail: 'Havn Energi · Workplace, 2025' },
+  { quote: 'The cabin rents itself out 20+ weeks a year now. The interior photographs so well it markets itself.', name: 'Private client', detail: 'Lysefjord Cabin · Residential, 2024' },
+];
+---
+<BaseLayout title="Fjord & Form — Interior architecture studio in Stavanger" currentPath="/">
+  <!-- ============ HERO (Webflow: hero + entrance timeline + parallax) ============ -->
+  <section class="hero">
+    <div class="hero-blob a" aria-hidden="true"></div>
+    <div class="hero-blob b" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow">Interior architecture · Stavanger</p>
+        <h1 class="heading-xl" style="margin-top:1rem">
+          <span class="line"><span>Spaces that work</span></span>
+          <span class="line"><span>as hard as <span class="serif-i" style="color:var(--accent-dark)">you do.</span></span></span>
+        </h1>
+        <p class="lead" style="margin-top:1.4rem">We design workplaces, hospitality and homes across Western Norway — daylight-first, operator-minded, and built to last decades, not design cycles.</p>
+        <div class="hero-actions">
+          <a href="/contact" class="button button-accent">Start a project <span class="arrow">→</span></a>
+          <a href="/work" class="button button-ghost">See selected work</a>
+        </div>
+        <div class="hero-meta">
+          <span class="badge"><span class="badge-dot"></span>Available for Q1 2027</span>
+          <span class="badge">★ 4.9 from 31 clients</span>
+          <span class="badge">Est. 2016 · 120+ projects</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <figure class="hero-card">
+          <img src="/images/hero-studio.svg" alt="Fjord & Form studio lounge — arched niches in warm beige and terracotta" width="1200" height="900" fetchpriority="high" />
+          <figcaption><strong>Verksgata 12</strong><span class="muted">Our studio, Skagen</span></figcaption>
+        </figure>
+        <div class="hero-float">
+          <strong>120+ projects</strong>
+          <span>across Rogaland since 2016 — 70% from repeat clients &amp; referrals.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LOGO MARQUEE (Webflow: marquee interaction) ============ -->
+  <div class="marquee" aria-label="Selected clients">
+    <div class="marquee-track">
+      {['Skagen Brygge', 'Havn Energi', 'Sola Strand', 'Aker Eiendom', 'Bouquet', 'Lysefjord', 'Fisketorget', 'Rogaland Teater'].concat(['Skagen Brygge', 'Havn Energi', 'Sola Strand', 'Aker Eiendom', 'Bouquet', 'Lysefjord', 'Fisketorget', 'Rogaland Teater']).map((c) => (
+        <span>{c} ✦</span>
+      ))}
+    </div>
+  </div>
+
+  <!-- ============ INTRO + STATS (Webflow: 2-col + counters) ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="reveal">
+          <p class="eyebrow">The studio</p>
+          <h2 class="heading-lg" style="margin-top:.8rem">Designers who measure, <span class="serif-i">not just moodboard.</span></h2>
+        </div>
+        <div class="reveal reveal-d1">
+          <p class="lead">Every project starts with behaviour — badge data, daylight readings, a week of watching how a space is really used. Then we draw. The result: rooms with reasons, documented so your team can run them for years.</p>
+          <p style="margin-top:1rem"><a href="/about" class="button button-ghost button-sm">More about the studio <span class="arrow">→</span></a></p>
+        </div>
+      </div>
+      <div class="stats reveal" style="margin-top:var(--s4)">
+        <div><strong>120+</strong><span>projects delivered since 2016</span></div>
+        <div><strong>18%</strong><span>avg. occupancy lift, hospitality</span></div>
+        <div><strong>−70%</strong><span>noise complaints, Havn Kontor</span></div>
+        <div><strong>2 days</strong><span>max. response time, guaranteed</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED WORK (Webflow CMS Collection List → Content Collections) ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:1.5rem;flex-wrap:wrap;margin-bottom:var(--s3)">
+        <div class="reveal">
+          <p class="eyebrow">Selected work</p>
+          <h2 class="heading-lg" style="margin-top:.8rem">Recent projects</h2>
+        </div>
+        <a href="/work" class="button button-ghost button-sm reveal">All projects <span class="arrow">→</span></a>
+      </div>
+      <div class="grid-3">
+        {projects.map((p, i) => (
+          <a href={`/work/${p.slug}`} class={`card project-card reveal reveal-d${i}`} aria-label={`${p.data.title} — case study`}>
+            <img class="card-img" src={p.data.cover} alt={p.data.coverAlt} loading="lazy" width="1200" height="900" />
+            <div class="card-body">
+              <p class="muted" style="font-size:.82rem;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">{p.data.location} · {p.data.year}</p>
+              <h3 class="heading-sm" style="margin-top:.4rem">{p.data.title}</h3>
+              <p class="muted" style="font-size:.95rem;margin-top:.3rem">{p.data.summary}</p>
+              <div class="tag-row">{p.data.services.map((s) => (<span class="tag">{s}</span>))}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ACCORDION (Webflow: accordion interaction) ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="split">
+        <div class="reveal">
+          <p class="eyebrow">Services</p>
+          <h2 class="heading-lg" style="margin-top:.8rem">Four ways to <span class="serif-i">work with us</span></h2>
+          <p class="lead" style="margin-top:1rem">Fixed scope, fixed price, senior people only. No juniors learning on your budget.</p>
+          <p style="margin-top:1.2rem"><a href="/contact" class="button button-primary button-sm">Ask what fits <span class="arrow">→</span></a></p>
+        </div>
+        <div class="accordion reveal reveal-d1" role="list">
+          {services.map((s, i) => (
+            <div class="accordion-item" data-accordion-item data-open={i === 0 ? 'true' : 'false'} role="listitem">
+              <button class="accordion-button" data-accordion-button aria-expanded={i === 0 ? 'true' : 'false'}>
+                {s.title}<span class="plus" aria-hidden="true">+</span>
+              </button>
+              <div class="accordion-panel"><div class="panel-inner"><p>{s.body}</p></div></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS (Webflow: slider → accessible slider) ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="slider reveal" data-slider aria-roledescription="carousel" aria-label="Client testimonials">
+        <p class="eyebrow">Client words</p>
+        <div class="slides" style="margin-top:1rem">
+          {testimonials.map((t, i) => (
+            <figure class={`slide${i === 0 ? ' active' : ''}`} data-slide aria-roledescription="slide" aria-label={`${i + 1} of ${testimonials.length}`}>
+              <blockquote>“{t.quote}”</blockquote>
+              <figcaption><strong style="color:var(--ink)">{t.name}</strong> — {t.detail}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <div class="slider-nav">
+          <button class="slider-btn" data-prev aria-label="Previous testimonial">←</button>
+          <button class="slider-btn" data-next aria-label="Next testimonial">→</button>
+          <div class="slider-dots" data-dots>
+            {testimonials.map((_, i) => (<button class={i === 0 ? 'active' : ''} aria-label={`Go to slide ${i + 1}`}></button>))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JOURNAL TEASER (Webflow CMS → Markdown) ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:1.5rem;flex-wrap:wrap;margin-bottom:var(--s3)">
+        <div class="reveal">
+          <p class="eyebrow">Journal</p>
+          <h2 class="heading-lg" style="margin-top:.8rem">Notes from the studio</h2>
+        </div>
+        <a href="/journal" class="button button-ghost button-sm reveal">All articles <span class="arrow">→</span></a>
+      </div>
+      <div class="journal-grid">
+        {posts.map((p, i) => (
+          <a href={`/journal/${p.slug}`} class={`card reveal reveal-d${i}`}>
+            <img class="card-img" src={p.data.cover} alt={p.data.coverAlt} loading="lazy" width="1200" height="900" />
+            <div class="card-body">
+              <p class="muted" style="font-size:.82rem;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">
+                {p.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {p.data.author}
+              </p>
+              <h3 class="heading-sm" style="margin-top:.4rem">{p.data.title}</h3>
+              <p class="muted" style="font-size:.95rem;margin-top:.3rem">{p.data.description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>

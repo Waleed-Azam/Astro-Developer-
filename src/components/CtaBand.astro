@@ -1,0 +1,19 @@
+---
+/** CTA band — migrated from Webflow "CTA" symbol. */
+interface Props { title?: string; text?: string }
+const { title = 'Have a space in mind? Let’s walk through it together.', text = 'Send a few lines about your project. We reply within two working days with honest next steps — no pitch deck, no pressure.' } = Astro.props;
+---
+<section class="section-tight">
+  <div class="container">
+    <div class="cta-band reveal">
+      <div>
+        <h2 class="heading-md">{title}</h2>
+        <p>{text}</p>
+      </div>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap">
+        <a href="/contact" class="button button-primary">Start a project <span class="arrow">→</span></a>
+        <a href="/work" class="button" style="border-color:rgba(255,255,255,.5);color:#fff">See our work</a>
+      </div>
+    </div>
+  </div>
+</section>

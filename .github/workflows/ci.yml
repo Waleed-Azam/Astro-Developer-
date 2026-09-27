@@ -1,0 +1,28 @@
+name: CI — check, build, smoke-test
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build:no-check
+      - name: Smoke test — required routes exist
+        run: |
+          for r in index.html about/index.html work/index.html journal/index.html contact/index.html migration/index.html 404.html; do
+            test -f "dist/$r" || (echo "MISSING dist/$r" && exit 1)
+          done
+          echo "✓ all routes built"
+      - name: Smoke test — no Webflow runtime leaked
+        run: |
+          ! grep -ri "webflow.js\|jquery-3" dist/ || (echo "Webflow runtime found in output!" && exit 1)
+          echo "✓ zero Webflow JS in output"
